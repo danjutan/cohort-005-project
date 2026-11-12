@@ -2003,6 +2003,50 @@ This course is still in draft while the cluster examples are rewritten against t
     `Created ${countRows(schema.comments)} lesson comments across ${countRows(schema.comments, isNull(schema.comments.parentId))} threads.`
   );
 
+  // ─── Bookmarks and Notes ───
+  // Private to each Student, on courses they are enrolled in. students[0] has
+  // rows on both courses so the Saved page shows two Courses and newest-first
+  // ordering; one Note was edited after it was written.
+
+  db.insert(schema.bookmarks)
+    .values([
+      { userId: students[0].id, lessonId: course1LessonIds[2], createdAt: daysAgo(28) },
+      { userId: students[0].id, lessonId: course1LessonIds[5], createdAt: daysAgo(10) },
+      { userId: students[0].id, lessonId: course2LessonIds[1], createdAt: daysAgo(3) },
+      { userId: students[2].id, lessonId: course1LessonIds[3], createdAt: daysAgo(7) },
+    ])
+    .run();
+
+  db.insert(schema.notes)
+    .values([
+      {
+        userId: students[0].id,
+        lessonId: course1LessonIds[2],
+        body: "Use `npx tsc` rather than a global install.\nKeeps the version pinned to the project.",
+        createdAt: daysAgo(29),
+        updatedAt: daysAgo(29),
+      },
+      {
+        userId: students[0].id,
+        lessonId: course2LessonIds[1],
+        body: "# Status codes\n400 = malformed request\n422 = well-formed but invalid",
+        createdAt: daysAgo(6),
+        updatedAt: daysAgo(2),
+      },
+      {
+        userId: students[2].id,
+        lessonId: course1LessonIds[3],
+        body: "Rewatch the section on type narrowing.",
+        createdAt: daysAgo(7),
+        updatedAt: daysAgo(7),
+      },
+    ])
+    .run();
+
+  console.log(
+    `Created ${countRows(schema.bookmarks)} bookmarks and ${countRows(schema.notes)} notes.`
+  );
+
   // ─── Lesson Progress ───
 
   // Helper to mark lessons as complete
@@ -2849,6 +2893,9 @@ This course is still in draft while the cluster examples are rewritten against t
   console.log(`  Enrollments: ${countRows(schema.enrollments)}`);
   console.log(`  Course ratings: ${countRows(schema.courseRatings)}`);
   console.log(`  Lesson comments: ${countRows(schema.comments)}`);
+  console.log(
+    `  Bookmarks: ${countRows(schema.bookmarks)}, Notes: ${countRows(schema.notes)}`
+  );
   console.log(
     `  Lesson progress: ${countRows(schema.lessonProgress)} (${countRows(schema.lessonProgress, eq(schema.lessonProgress.status, LessonProgressStatus.Completed))} completed)`
   );
