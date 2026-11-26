@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useFetcher } from "react-router";
 import { Lock, NotebookPen } from "lucide-react";
+import { toast } from "sonner";
 import type { Route } from "../../routes/+types/courses.$slug.lessons.$lessonId";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent } from "~/components/ui/card";
@@ -21,6 +22,12 @@ export function LessonNote({ note }: { note: SavedNote }) {
   const status = noteDraftStatus(draft, note?.body ?? null);
   const isSaving = fetcher.state !== "idle";
   const error = isSaving ? undefined : fetcher.data?.error;
+
+  // A toast, as the discussion form does: an inline error outlived the draft
+  // that caused it.
+  useEffect(() => {
+    if (error) toast.error(error);
+  }, [error]);
 
   return (
     <Card className="mb-8">
@@ -48,11 +55,7 @@ export function LessonNote({ note }: { note: SavedNote }) {
               {isSaving ? "Saving..." : "Save note"}
             </Button>
 
-            <NoteState
-              error={error}
-              dirty={status.dirty}
-              updatedAt={note?.updatedAt}
-            />
+            <NoteState dirty={status.dirty} updatedAt={note?.updatedAt} />
 
             <span
               className={cn(
@@ -89,15 +92,12 @@ function NoteHeading() {
 }
 
 function NoteState({
-  error,
   dirty,
   updatedAt,
 }: {
-  error: string | undefined;
   dirty: boolean;
   updatedAt: string | undefined;
 }) {
-  if (error) return <span className="text-sm text-destructive">{error}</span>;
   if (dirty && updatedAt) {
     return (
       <span className="text-xs text-muted-foreground">Unsaved changes</span>
