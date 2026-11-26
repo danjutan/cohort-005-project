@@ -325,6 +325,10 @@ export function getLessonThread(lessonId: number): ThreadComment[] {
   return topLevel.filter((c) => !c.deleted || c.replies.length > 0);
 }
 
+export function getQuizById(quizId: number) {
+  return db.select().from(quizzes).where(eq(quizzes.id, quizId)).get();
+}
+
 export function getQuizByLessonId(lessonId: number) {
   return db.select().from(quizzes).where(eq(quizzes.lessonId, lessonId)).get();
 }
