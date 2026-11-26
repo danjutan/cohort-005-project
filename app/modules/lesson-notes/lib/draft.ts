@@ -6,7 +6,6 @@ export type NoteDraftStatus = {
   max: number;
   empty: boolean;
   tooLong: boolean;
-  /** The draft differs from what is saved. */
   dirty: boolean;
   canSave: boolean;
 };
